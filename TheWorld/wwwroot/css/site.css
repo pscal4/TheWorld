@@ -4,11 +4,13 @@
     margin : 0;
 }
 label {
-    font-weight : bold;
+    font
+        -weight : bold;
     display: block;
 }
 input[type=text], input[type=password], textarea {
     width: 150px;
+    word-wrap : break-word;
 }
 #main {
     background-color:#eee;
@@ -40,14 +42,24 @@ input[type=text], input[type=password], textarea {
 }
 #sidebar {
     background: #2a2c36;
-    color:#eee;
-    position:fixed;
-    height:100%;
+    color: #eee;
+    position: fixed;
+    height: 100%;
     width: 250px;
-    overflow : hidden;
-    left : 0;
-    margin : 0;
+    overflow: hidden;
+    left: 0;
+    margin: 0;
+    transition: left ease .25s;
+}
+#sidebar.hide-sidebar {
+    left : -250px;
+    transition: left ease .25s;
 }
 #wrapper {
     margin: 0 0 0 250px;
+    transition: margin-left ease .25s;
 }
+    #wrapper.hide-sidebar {
+        margin-left: 0;
+        transition: margin-left ease .25s;
+    }
