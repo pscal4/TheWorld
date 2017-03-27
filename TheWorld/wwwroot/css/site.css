@@ -4,13 +4,12 @@
     margin : 0;
 }
 label {
-    font
-        -weight : bold;
+    font-weight : bold;
+
     display: block;
 }
 input[type=text], input[type=password], textarea {
     width: 150px;
-    word-wrap : break-word;
 }
 #main {
     background-color:#eee;
