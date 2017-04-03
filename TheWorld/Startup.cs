@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TheWorld.Services;
 using Microsoft.Extensions.Configuration;
+using TheWorld.Models;
+using Newtonsoft.Json.Serialization;
 
 namespace TheWorld
 {
@@ -41,13 +43,26 @@ namespace TheWorld
                 // Implement a real mail service
             }
 
-            services.AddMvc(); // Dependency injection
-        }
+            services.AddLogging();
+            services.AddDbContext<WorldContext>();
 
+            services.AddTransient<WorldContextSeedData>();
+            services.AddScoped<IWorldRepository, WorldRepository>();
+
+            // Dependency injection (i.e. injecting MVC)
+            services.AddMvc()
+            .AddJsonOptions(opt =>
+            {
+                opt.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            });
+        }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, WorldContextSeedData seeder)
         {
+
             //loggerFactory.AddConsole();
+            loggerFactory.AddDebug(LogLevel.Warning);
+           
 
             //if (env.IsDevelopment())
             if (env.IsEnvironment("Development")) {
@@ -75,7 +90,8 @@ namespace TheWorld
                 
             );
 
-      
+            // This is seeding the database
+            seeder.EnsureSeedData();
 
         }
     }

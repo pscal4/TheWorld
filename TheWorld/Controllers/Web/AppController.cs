@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TheWorld.ViewModels;
 using TheWorld.Services;
 using Microsoft.Extensions.Configuration;
+using TheWorld.Models;
 
 namespace TheWorld.Controllers.Web
 {
@@ -14,17 +15,20 @@ namespace TheWorld.Controllers.Web
     {
         private IMailServices _mailService;
         private IConfigurationRoot _config;
+        private IWorldRepository _repository;
 
-        public AppController(IMailServices mailService, IConfigurationRoot config)
+        public AppController(IMailServices mailService, IConfigurationRoot config, IWorldRepository repository)
         {
             _mailService = mailService;
             _config = config;
+            _repository = repository;
         }
 
         public IActionResult Index()
         {
+            var data = _repository.GetAllTrips();
             // Find a view, render it and return it
-            return View();
+            return View(data);
         }
         public IActionResult About()
         {

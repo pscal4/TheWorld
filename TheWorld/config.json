@@ -1,5 +1,8 @@
 {
   "MailSettings": {
     "ToAddress": "pscalfano@hotmail.com"
+  },
+  "ConnectionStrings": {
+    "WorldContextConnection":  "Server=PJSWINDOWS10VM;Database=TheWorldDb;Trusted_Connection=true;MultipleActiveResultSets=true"
   }
 }
