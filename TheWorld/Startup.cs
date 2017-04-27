@@ -11,13 +11,17 @@ using TheWorld.Services;
 using Microsoft.Extensions.Configuration;
 using TheWorld.Models;
 using Newtonsoft.Json.Serialization;
+using AutoMapper;
+using TheWorld.ViewModels;
 
 namespace TheWorld
 {
     public class Startup
     {
         private IHostingEnvironment _env;
-        private IConfigurationRoot _config;
+        public static IConfigurationRoot Configuration;
+
+
 
         public Startup(IHostingEnvironment env)
         {
@@ -26,13 +30,13 @@ namespace TheWorld
                 .SetBasePath(_env.ContentRootPath)
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables();
-            _config = builder.Build();
+            Configuration = builder.Build();
         }
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(_config);
+            services.AddSingleton(Configuration);
 
             if (_env.IsDevelopment())
             {
@@ -46,6 +50,7 @@ namespace TheWorld
             services.AddLogging();
             services.AddDbContext<WorldContext>();
 
+            services.AddScoped<CoordService>();
             services.AddTransient<WorldContextSeedData>();
             services.AddScoped<IWorldRepository, WorldRepository>();
 
@@ -53,6 +58,8 @@ namespace TheWorld
             services.AddMvc()
             .AddJsonOptions(opt =>
             {
+                // This one is not camel case opt.SerializerSettings.ContractResolver = new DefaultContractResolver(); 
+                // But I didn't need this to get camel case
                 opt.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
         }
@@ -77,6 +84,12 @@ namespace TheWorld
             // This is to serve html,css, js from wwwwroot folder
             //app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            Mapper.Initialize(config =>
+            {
+                config.CreateMap<Trip, TripViewModel>().ReverseMap();
+                config.CreateMap<Stop, StopViewModel>().ReverseMap();
+            });
 
             // Setting up MVC with a route
             app.UseMvc( config =>

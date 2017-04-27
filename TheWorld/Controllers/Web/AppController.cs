@@ -8,6 +8,7 @@ using TheWorld.ViewModels;
 using TheWorld.Services;
 using Microsoft.Extensions.Configuration;
 using TheWorld.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TheWorld.Controllers.Web
 {
@@ -26,10 +27,17 @@ namespace TheWorld.Controllers.Web
 
         public IActionResult Index()
         {
+            return View();
+        }
+        [Authorize]
+        public IActionResult Trips()
+        {
             var data = _repository.GetAllTrips();
             // Find a view, render it and return it
             return View(data);
+
         }
+
         public IActionResult About()
         {
               return View();
