@@ -13,6 +13,8 @@ using TheWorld.Models;
 using Newtonsoft.Json.Serialization;
 using AutoMapper;
 using TheWorld.ViewModels;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TheWorld
 {
@@ -55,16 +57,32 @@ namespace TheWorld
             services.AddScoped<IWorldRepository, WorldRepository>();
 
             // Dependency injection (i.e. injecting MVC)
-            services.AddMvc()
+            services.AddMvc(config =>
+            {
+#if !DEBUG
+                config.Filters.Add(new RequireHttpsAttribute();
+#endif
+            }
+
+            )
             .AddJsonOptions(opt =>
             {
                 // This one is not camel case opt.SerializerSettings.ContractResolver = new DefaultContractResolver(); 
                 // But I didn't need this to get camel case
                 opt.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
+
+            services.AddIdentity<WorldUser, IdentityRole>(config =>
+            {
+                config.User.RequireUniqueEmail = true;
+                config.Password.RequiredLength = 8;
+                config.Cookies.ApplicationCookie.LoginPath = "/Auth/Login";
+
+            })
+            .AddEntityFrameworkStores<WorldContext>();
         }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, WorldContextSeedData seeder)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, WorldContextSeedData seeder)
         {
 
             //loggerFactory.AddConsole();
@@ -84,6 +102,7 @@ namespace TheWorld
             // This is to serve html,css, js from wwwwroot folder
             //app.UseDefaultFiles();
             app.UseStaticFiles();
+            app.UseIdentity();
 
             Mapper.Initialize(config =>
             {
@@ -104,7 +123,7 @@ namespace TheWorld
             );
 
             // This is seeding the database
-            seeder.EnsureSeedData();
+            await seeder.EnsureSeedDataAsync();
 
         }
     }
