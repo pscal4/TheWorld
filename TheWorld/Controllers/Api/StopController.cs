@@ -9,12 +9,14 @@ using System.Net;
 using AutoMapper;
 using TheWorld.ViewModels;
 using TheWorld.Services;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace TheWorld.Controllers.Api
 {
     [Route("api/trips/{tripName}/stops")]
+    [Authorize]
     public class StopController : Controller
     {
         private IWorldRepository _repository;
@@ -33,7 +35,7 @@ namespace TheWorld.Controllers.Api
         {
             try
             {
-                var results = _repository.GetTripByName(tripName);
+                var results = _repository.GetTripByName(tripName, User.Identity.Name);
                 // Above will return null if not found
                 if (results == null)
                 {
@@ -70,7 +72,7 @@ namespace TheWorld.Controllers.Api
                     newStop.Longitude = coordResult.Longitude;
 
                     // Save to the database
-                    _repository.AddStop(tripName, newStop);
+                    _repository.AddStop(tripName, User.Identity.Name, newStop);
 
                     if (_repository.SaveAll())
                     {
